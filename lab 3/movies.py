@@ -76,6 +76,8 @@ movies = [
 }
 ]
 
+# here i will use f-strings for clear answers printing
+
 def hight_score(movs):
     listof = []
     for x in movs:
