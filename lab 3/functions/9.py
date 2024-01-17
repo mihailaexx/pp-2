@@ -1,2 +1,4 @@
 import math
-print(4/3 * math.pi * math.pow(int(input()), 3))
+def find_volume_of_sphere(radius):
+    return 4/3 * math.pi * math.pow(radius, 3)
+print(find_volume_of_sphere(int(input())))
