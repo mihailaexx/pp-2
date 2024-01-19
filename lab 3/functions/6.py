@@ -1,1 +1,2 @@
-print(*input().split()[::-1])
+def my_function(**kid):
+    print("His last name is " + kid["lname"])

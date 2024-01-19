@@ -1,3 +1,2 @@
-from itertools import permutations 
-for row in permutations(input()):
-    print(*row)
+def my_function(*kids):
+    print("The youngest child is " + kids[2])
