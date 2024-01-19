@@ -1,5 +1,3 @@
 from itertools import permutations 
-a = str(input())
-b = permutations(a)
-for row in list(b):
+for row in permutations(input()):
     print(*row)
