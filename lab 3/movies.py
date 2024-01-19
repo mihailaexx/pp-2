@@ -76,8 +76,6 @@ movies = [
 }
 ]
 
-# here i will use f-strings for clear answers printing
-
 def good_score(movs, name):
     return "True" if [x["name"] for x in movs if x["name"] == name and x["imdb"] > 5.5] else "False"
 
@@ -94,8 +92,8 @@ def avg_rating(movs):
 def avg_rating_from_category(movs, category):
     return avg_rating([x for x in movs if x["category"] == category])
 
-#print(good_score(movies, "Usual Suspects"))
-#print(*listof_hight_score(movies), sep="\n")
-#print(*find_all_from_category(movies, "Suspense"), sep="\n")
-#print(avg_rating(movies))
+print(good_score(movies, "Usual Suspects"))
+print(*listof_hight_score(movies), sep="\n")
+print(*find_all_from_category(movies, "Suspense"), sep="\n")
+print(avg_rating(movies))
 print(avg_rating_from_category(movies, "Suspense"))
