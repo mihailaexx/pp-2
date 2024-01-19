@@ -78,44 +78,24 @@ movies = [
 
 # here i will use f-strings for clear answers printing
 
-def hight_score(movs):
-    listof = []
-    for x in movs:
-        if x["imdb"] > 5.5:
-            listof.append(f"{x["name"]}")
-    return "\n".join(listof)
+def good_score(movs, name):
+    return "True" if [x["name"] for x in movs if x["name"] == name and x["imdb"] > 5.5] else "False"
 
 def listof_hight_score(movs):
-    listof = []
-    for x in movs:
-        if x["imdb"] > 5.5:
-            listof.append(f"{x['name']}, {x['imdb']}, {x['category']}")
-    return "\n".join(listof)
+    return [x["name"] for x in movs if x["imdb"] > 5.5]
 
 def find_all_from_category(movs, category):
-    listof = []
-    for x in movs:
-        if x["category"] == category:
-            listof.append(f"{x["name"]}")
-    return "\n".join(listof)
+    return [x["name"] for x in movs if x["category"] == category]
 
 def avg_rating(movs):
-    rating = 0
-    for x in movs:
-        rating+=x["imdb"]
-    return rating/len(movs)
+    if movs: return sum(x["imdb"] for x in movs) / len(movs)
+    return 0
 
 def avg_rating_from_category(movs, category):
-    rating = 0
-    i=0
-    for x in movs:
-        if x["category"] == category:
-            rating+=x["imdb"]
-            i+=1
-    return rating/i if i > 0 else 0 # add checking for dividing to zero to avoid errors
+    return avg_rating([x for x in movs if x["category"] == category])
 
-print(hight_score(movies))
-print(listof_hight_score(movies))
-print(find_all_from_category(movies, "Suspense"))
-print(avg_rating(movies))
+#print(good_score(movies, "Usual Suspects"))
+#print(*listof_hight_score(movies), sep="\n")
+#print(*find_all_from_category(movies, "Suspense"), sep="\n")
+#print(avg_rating(movies))
 print(avg_rating_from_category(movies, "Suspense"))
