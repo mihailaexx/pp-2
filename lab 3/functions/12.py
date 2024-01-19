@@ -1,5 +1,3 @@
 def histogram(list):
-    for x in list:
-        print(x*"*")
-    return
-histogram([4, 9, 7])
+    return "\n".join([x*"*" for x in list])
+print(histogram([4, 9, 7]))
