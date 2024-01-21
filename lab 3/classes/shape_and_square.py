@@ -1,4 +1,7 @@
 class Shape:
+    def __init__(self):
+        self.length = 0
+        self.width = 0
     def area(self):
         return "0"
 class Square(Shape):
