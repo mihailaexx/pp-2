@@ -12,10 +12,6 @@ clock_min_rect = clock_min.get_rect(center=(450, 450))
 clock_sec = pygame.image.load("line_s2.png")
 clock_sec_rect = clock_sec.get_rect(center=(450, 450))
 
-now = datetime.datetime.now() + datetime.timedelta(seconds=1) # to avoid delay
-angle_sec = now.second * (-6)
-angle_min = now.minute * (-6) + now.second * (-0.1)
-
 clock = pygame.time.Clock()
 
 done = 0
@@ -25,6 +21,10 @@ while not done:
             done = 1
     screen.fill((255,255,255))
     screen.blit(clock_image, (150,150))
+    
+    now = datetime.datetime.now()
+    angle_sec = now.second * (-6)
+    angle_min = now.minute * (-6) + now.second * (-0.1)
     
     rotated_clock_sec = pygame.transform.rotate(clock_sec, angle_sec) # rotating
     rotated_clock_min = pygame.transform.rotate(clock_min, angle_min)
@@ -36,6 +36,4 @@ while not done:
     screen.blit(rotated_clock_min, rotated_rect_min.topleft)
     
     pygame.display.flip()
-    angle_sec -= 6 # 6 degrees per second
-    angle_min -= 0.1 # 6 degrees per minute
     clock.tick(1)
