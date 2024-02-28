@@ -4,7 +4,7 @@ pygame.init()
 size = (1000, 900)
 screen = pygame.display.set_mode(size)
 
-def crete_entity():
+def crete_entity(): # create tuple of coords
     return (random.randint(1,18)*50+25, random.randint(1,16)*50+25)
 def check_boundary():
     if x < snake_part_radius or x > size[0] - snake_part_radius or y < snake_part_radius or y > size[1] - snake_part_radius:
@@ -24,12 +24,16 @@ apple_pos = crete_entity()
 
 # score
 score = 0
-font = pygame.font.Font(None, 36)
+level = 0
+font = pygame.font.Font(None, 24)
 
 last_move = None
 FPS = 2
 done = False
 
+log = open("snake_log.txt", "w") # decide to add a log -\_(>.<)_/-
+log.write('''---START GAME---
+''')
 
 while not done:
     for event in pygame.event.get():
@@ -55,8 +59,10 @@ while not done:
         # Check if apple position overlaps with snake parts
         while apple_pos in snake_parts:
             apple_pos = crete_entity()
-        print(f'''YOU COLLECT APPLE
-New apple apear in {apple_pos}''')
+        log.write(f'''YOU COLLECT APPLE
+New apple apear in {apple_pos}
+
+''')
         snake_parts.append((x,y))
         score += 1
     
@@ -71,7 +77,9 @@ New apple apear in {apple_pos}''')
         pygame.draw.circle(screen, snake_color, part, snake_part_radius)
     
     score_text = font.render(f"Score: {score}", True, (0, 0, 0))
+    level_text = font.render(f"Level: {level}", True, (0, 0, 0))
     screen.blit(score_text, (10, 10))
+    screen.blit(level_text, (10, 30))
     
     # moving depended on last pressed key
     if last_move == pygame.K_UP: y-=snake_part_diametr
@@ -82,21 +90,24 @@ New apple apear in {apple_pos}''')
     # collision
     if (x, y) in snake_parts and len(snake_parts) != 1:
         done = True
-        print(f'''YOU LOSE
+        log.write(f'''YOU LOSE
 Reason: crash into yourself
 Score:{score}''')
     
     # borders
     if check_boundary():
         done = True
-        print(f'''YOU LOSE
+        log.write(f'''YOU LOSE
 Reason: out of border
-Score:{score}''')
+Score:{score}
+''')
     
     # maybe someone wanna check this test???? :)
     if len(snake_parts) == 20*18:
         done = True
-        print("YOU WIN!!!")
-
+        log.write("YOU WIN!!!")
+    level = score//2
     pygame.display.flip()
-    pygame.time.Clock().tick(2+(score/8))
+    pygame.time.Clock().tick(0.25*level+2)
+log.write("---END GAME---")
+log.close()
