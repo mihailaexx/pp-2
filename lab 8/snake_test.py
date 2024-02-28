@@ -2,6 +2,10 @@ import pygame, random, time
 pygame.init()
 size = (1000, 900)
 screen = pygame.display.set_mode(size)
+screen_net = pygame.Surface(size, pygame.SRCALPHA)
+for i in range(1,20):
+    pygame.draw.line(screen_net, (0,0,0,130), (0, i*50), (1000, i*50))
+    pygame.draw.line(screen_net, (0,0,0,130), (i*50, 0), (i*50, 900))
 
 def crete_entity(): # create tuple of coords
     return (random.randint(1,18)*50+25, random.randint(1,16)*50+25)
@@ -52,7 +56,7 @@ while not done:
             elif event.key == pygame.K_RIGHT and last_move != pygame.K_LEFT:
                 last_move = pygame.K_RIGHT
     screen.fill((255, 255, 255))
-    
+    screen.blit(screen_net, (0,0))
     # apple
     pygame.draw.circle(screen, apple_color, apple_pos, snake_part_radius)
     if (x,y) == apple_pos:
