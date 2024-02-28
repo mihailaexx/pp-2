@@ -1,5 +1,4 @@
-import pygame, random
-
+import pygame, random, time
 pygame.init()
 size = (1000, 900)
 screen = pygame.display.set_mode(size)
@@ -26,10 +25,12 @@ apple_pos = crete_entity()
 score = 0
 level = 0
 font = pygame.font.Font(None, 24)
+go_font = pygame.font.Font(None, 128)
 
 last_move = None
 FPS = 2
 done = False
+game_over = False
 
 log = open("snake_log.txt", "w") # decide to add a log -\_(>.<)_/-
 log.write('''---START GAME---
@@ -89,14 +90,14 @@ New apple apear in {apple_pos}
     
     # collision
     if (x, y) in snake_parts and len(snake_parts) != 1:
-        done = True
+        game_over = True
         log.write(f'''YOU LOSE
 Reason: crash into yourself
 Score:{score}''')
     
     # borders
     if check_boundary():
-        done = True
+        game_over = True
         log.write(f'''YOU LOSE
 Reason: out of border
 Score:{score}
@@ -107,6 +108,14 @@ Score:{score}
         done = True
         log.write("YOU WIN!!!")
     level = score//2
+    
+    if game_over: # add a game over screen
+        game_over_text = go_font.render("GAME OVER", True, (255,0,0), (12,12,12))
+        screen.blit(game_over_text, (250,300))
+        pygame.display.flip()
+        time.sleep(2)  # Add a 5-second delay
+        done = True
+    
     pygame.display.flip()
     pygame.time.Clock().tick(0.25*level+2)
 log.write("---END GAME---")
