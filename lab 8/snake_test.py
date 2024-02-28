@@ -22,6 +22,10 @@ snake_parts = [(x,y)] # add head manually
 apple_color = (230,0,0)
 apple_pos = crete_entity()
 
+# score
+score = 0
+font = pygame.font.Font(None, 36)
+
 last_move = None
 FPS = 2
 done = False
@@ -54,6 +58,7 @@ while not done:
         print(f'''YOU COLLECT APPLE
 New apple apear in {apple_pos}''')
         snake_parts.append((x,y))
+        score += 1
     
     # pos updating
     for i in range(len(snake_parts) - 1, 0, -1):
@@ -65,6 +70,9 @@ New apple apear in {apple_pos}''')
     for part in snake_parts:
         pygame.draw.circle(screen, snake_color, part, snake_part_radius)
     
+    score_text = font.render(f"Score: {score}", True, (0, 0, 0))
+    screen.blit(score_text, (10, 10))
+    
     # moving depended on last pressed key
     if last_move == pygame.K_UP: y-=snake_part_diametr
     elif last_move == pygame.K_DOWN: y+=snake_part_diametr
@@ -74,19 +82,21 @@ New apple apear in {apple_pos}''')
     # collision
     if (x, y) in snake_parts and len(snake_parts) != 1:
         done = True
-        print('''YOU LOSE
-Reason: crash into yourself''')
+        print(f'''YOU LOSE
+Reason: crash into yourself
+Score:{score}''')
     
     # borders
     if check_boundary():
         done = True
-        print('''YOU LOSE
-Reason: out of border''')
+        print(f'''YOU LOSE
+Reason: out of border
+Score:{score}''')
     
     # maybe someone wanna check this test???? :)
     if len(snake_parts) == 20*18:
         done = True
         print("YOU WIN!!!")
-    
+
     pygame.display.flip()
-    pygame.time.Clock().tick(FPS)
+    pygame.time.Clock().tick(2+(score/8))
