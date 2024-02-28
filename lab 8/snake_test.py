@@ -4,25 +4,28 @@ pygame.init()
 size = (1000, 900)
 screen = pygame.display.set_mode(size)
 
+def crete_entity():
+    return (random.randint(1,18)*50+25, random.randint(1,16)*50+25)
+def check_boundary():
+    if x < snake_part_radius or x > size[0] - snake_part_radius or y < snake_part_radius or y > size[1] - snake_part_radius:
+        return True
+    return False
+
 # snake consist of balls
-x = 25 # head x cord
-y = 25 # head y cord
+x = crete_entity()[0] # head x cord
+y = crete_entity()[1] # head y cord
 snake_part_radius = 25
 snake_part_diametr = 2 * snake_part_radius
-snake_color = (0,128,0)
+snake_color = (0,100,0)
 snake_parts = [(x,y)] # add head manually
 
 apple_color = (230,0,0)
-apple_pos = (random.randint(1,18)*50+25, random.randint(1,16)*50+25)
+apple_pos = crete_entity()
 
 last_move = None
 FPS = 2
 done = False
 
-
-
-
-clock = pygame.time.Clock()
 
 while not done:
     for event in pygame.event.get():
@@ -44,12 +47,12 @@ while not done:
     # apple
     pygame.draw.circle(screen, apple_color, apple_pos, snake_part_radius)
     if (x,y) == apple_pos:
-        print("YOU COLLECT APPLE")
-        apple_pos = (random.randint(1,18)*50+25, random.randint(1,16)*50+25)
+        apple_pos = crete_entity()
         # Check if apple position overlaps with snake parts
         while apple_pos in snake_parts:
-            apple_pos = (random.randint(1,18)*50+25, random.randint(1,16)*50+25)
-        print(apple_pos)
+            apple_pos = crete_entity()
+        print(f'''YOU COLLECT APPLE
+New apple apear in {apple_pos}''')
         snake_parts.append((x,y))
     
     # pos updating
@@ -71,17 +74,19 @@ while not done:
     # collision
     if (x, y) in snake_parts and len(snake_parts) != 1:
         done = True
-        print("YOU LOSE")
+        print('''YOU LOSE
+Reason: crash into yourself''')
     
     # borders
-    if x >= snake_part_radius and x <= size[0]-snake_part_radius: x = max(snake_part_radius, min(x, size[0]-snake_part_radius))
-    else: 
+    if check_boundary():
         done = True
-        print("YOU LOSE")
-    if y >= snake_part_radius and y <= size[1]-snake_part_radius: y = max(snake_part_radius, min(y, size[1]-snake_part_radius))
-    else: 
+        print('''YOU LOSE
+Reason: out of border''')
+    
+    # maybe someone wanna check this test???? :)
+    if len(snake_parts) == 20*18:
         done = True
-        print("YOU LOSE")
+        print("YOU WIN!!!")
     
     pygame.display.flip()
-    clock.tick(FPS)
+    pygame.time.Clock().tick(FPS)
