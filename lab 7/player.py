@@ -1,9 +1,12 @@
+from time import sleep
 import pygame
 
 screen_w, screen_h = 640, 400
 screen = pygame.display.set_mode((screen_w, screen_h))
 pygame.init()
-pygame.mixer.init()
+pygame.mixer.pre_init(44100, 16, 2, 4096)
+pygame.init()
+screen.fill((255,255,255))
 
 # Constants
 END_SONG = pygame.USEREVENT + 1
@@ -12,9 +15,9 @@ FPS = 30
 
 # Variables
 volume = 1
-play = False
-loop = False
-done = False
+play = 0
+loop = 0
+done = 0
 
 font = pygame.font.Font(None, 24)
 # creating button surfaces
@@ -36,10 +39,10 @@ next_text_rect = next_text.get_rect(center=(button_next_surface.get_width()/2, b
 prev_text_rect = prev_text.get_rect(center=(button_prev_surface.get_width()/2, button_prev_surface.get_height()/2))
 loop_text_rect = loop_text.get_rect(center=(button_loop_surface.get_width()/2, button_loop_surface.get_height()/2))
 # create black rectangles for layout
-button_play_rect = pygame.Rect((screen_w-150)/2, 310, 150, 50)
-button_next_rect = pygame.Rect((screen_w-150)/2+165, 310, 50, 50)
-button_prev_rect = pygame.Rect((screen_w-150)/2-65, 310, 50, 50)
-button_loop_rect = pygame.Rect(((screen_w-150)/2+230, 310, 50, 50))
+button_play_rect = pygame.Rect((screen_w-150)/2, screen_h-90, 150, 50)
+button_next_rect = pygame.Rect((screen_w-150)/2+165, screen_h-90, 50, 50)
+button_prev_rect = pygame.Rect((screen_w-150)/2-65, screen_h-90, 50, 50)
+button_loop_rect = pygame.Rect(((screen_w-150)/2+230, screen_h-90, 50, 50))
 progress_bar_rect = pygame.Rect(50, 280, screen_w-50, 2)
 
 # Initialize pygame mixer and clock
@@ -81,10 +84,10 @@ def play_previous_song():
 def looop():
     global loop
     if loop:
-        loop = False
+        loop = 0
         print("Loop off")
     else:
-        loop = True
+        loop = 1
         print("Loop on")
 
 def fill_progress(): # заполнение бара в зависимости от текущей секунды
@@ -101,7 +104,7 @@ while not done:
         
         # close windows = quit
         if event.type == pygame.QUIT:
-            done = True
+            done = 1
             
         # space = play/stop
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: 
@@ -121,23 +124,23 @@ while not done:
             # button click = play/stop
             if button_play_rect.collidepoint(event.pos):
                 if play:
-                    play = False
+                    play = 0
                     print("Button \"Pause\" clicked!")
                 else:
-                    play = True
+                    play = 1
                     print("Button \"Play\" clicked!")
             # button play next even if paused
             if button_next_rect.collidepoint(event.pos):
                 if currently_playing_song != -1: 
                     play_next_song()
-                    play = True
+                    play = 1
                     pygame.draw.rect(progress_bar_surface, (0,0,0), (0,0,540,2))
                     print("Button \"Next\" clicked!")
             # button previous next even if paused
             if button_prev_rect.collidepoint(event.pos):
                 if currently_playing_song != -1: 
                     play_previous_song()
-                    play = True
+                    play = 1
                     pygame.draw.rect(progress_bar_surface, (0,0,0), (0,0,540,2))
                     print("Button \"Prev\" clicked!")
             if button_loop_rect.collidepoint(event.pos):
@@ -145,7 +148,6 @@ while not done:
                 print("Button \"Loop\" clicked!")
 
 
-    screen.fill((255,255,255))
     fill_progress()
     
     if not play: button_play_surface.blit(play_text, play_text_rect)
