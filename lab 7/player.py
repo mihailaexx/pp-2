@@ -18,6 +18,7 @@ volume = 1
 play = 0
 loop = 0
 done = 0
+song_length = 0
 
 font = pygame.font.Font(None, 24)
 # creating button surfaces
@@ -55,7 +56,7 @@ currently_playing_song = -1
 
 
 def play_next_song(): # через костыли ну да ;)
-    global currently_playing_song, songs, loop
+    global currently_playing_song, songs, loop, song_length
     next_song = currently_playing_song + 1
     if loop:
         if currently_playing_song == -1:
@@ -65,11 +66,12 @@ def play_next_song(): # через костыли ну да ;)
     else:
         currently_playing_song = 0
     print(f"played next song №{currently_playing_song+1}")
+    song_length = 0
     pygame.mixer.music.load(f"lab 7/{songs[currently_playing_song]}")
     pygame.mixer.music.play()
 
 def play_previous_song():
-    global currently_playing_song, songs, loop
+    global currently_playing_song, songs, loop, song_length
     previous_song = currently_playing_song -1
     if loop:
         pass
@@ -78,38 +80,33 @@ def play_previous_song():
     else:
         currently_playing_song = len(songs)-1
     print(f"played previous song №{currently_playing_song+1}")
+    song_length = 0
     pygame.mixer.music.load(f"lab 7/{songs[currently_playing_song]}")
     pygame.mixer.music.play()
 
 def looop():
     global loop
-    if loop:
-        loop = 0
-        print("Loop off")
-    else:
-        loop = 1
-        print("Loop on")
+    loop = not loop
+    print("Loop on") if loop else print("Loop off")
 
-def fill_progress(): # заполнение бара в зависимости от текущей секунды
-    global currently_playing_song
+def fill_progress(): # filling progress bar depending on second of track
+    global currently_playing_song, song_length
     if play:
         pos_now = pygame.mixer.music.get_pos()
-        track_len = pygame.mixer.Sound(f"lab 7/{songs[currently_playing_song]}").get_length()
-        colored_part = 540/track_len * (pos_now / 1000)
+        if not song_length:
+            song_length = pygame.mixer.Sound(f"lab 7/{songs[currently_playing_song]}").get_length()
+        colored_part = 540/song_length * (pos_now / 1000)
         pygame.draw.rect(progress_bar_surface, (255,0,0), (0, 0, colored_part, 2))
     
     
 while not done:
     for event in pygame.event.get():
-        
         # close windows = quit
         if event.type == pygame.QUIT:
             done = 1
-            
         # space = play/stop
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE: 
             play = not play
-        
         # right = next, left = previous, l = loop
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
@@ -118,8 +115,6 @@ while not done:
                 play_previous_song()
             if event.key == pygame.K_l:
                 looop()
-        
-        
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             # button click = play/stop
             if button_play_rect.collidepoint(event.pos):
