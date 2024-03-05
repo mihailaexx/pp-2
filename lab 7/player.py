@@ -25,18 +25,18 @@ button_play_surface = pygame.Surface((150, 50))
 button_next_surface = pygame.Surface((50, 50))
 button_prev_surface = pygame.Surface((50, 50))
 button_loop_surface = pygame.Surface((50, 50))
-button_volume_surface = pygame.Surface((50, 50))
-progress_bar_surface = pygame.Surface((540, 2))
+button_volume_surface = pygame.Surface((100, 50))
+progress_bar_surface = pygame.Surface((540, 4))
 # create var's with diff texts
 play_text = font.render("Play", True, (54, 50, 135))
 pause_text = font.render("Pause", True, (54, 50, 135))
 next_text = font.render("Next", True, (54, 50, 135))
 prev_text = font.render("Prev", True, (54, 50, 135))
 loop_text = font.render("Loop", True, (54, 50, 135))
-time_now_text = font.render("", True, (0, 0, 0))
-time_duration_text = font.render("", True, (0, 0, 0))
-track_text = font.render("", True, (54, 50, 135))
-button_volume_text = font.render(f"{volume}", True, (54, 50, 135))
+time_now_text = font.render("0:00", True, (54, 50, 135))
+time_duration_text = font.render("0:00", True, (54, 50, 135))
+track_name = font.render("None", True, (54, 50, 135))
+button_volume_text = font.render(f"{volume}", True, (0,0,0))
 # centering text in button
 play_text_rect = play_text.get_rect(center=(button_play_surface.get_width()/2, button_play_surface.get_height()/2))
 pause_text_rect = pause_text.get_rect(center=(button_play_surface.get_width()/2, button_play_surface.get_height()/2))
@@ -49,8 +49,8 @@ button_play_rect = pygame.Rect((screen_w-150)/2, screen_h-90, 150, 50)
 button_next_rect = pygame.Rect((screen_w-150)/2+165, screen_h-90, 50, 50)
 button_prev_rect = pygame.Rect((screen_w-150)/2-65, screen_h-90, 50, 50)
 button_loop_rect = pygame.Rect(((screen_w-150)/2+230, screen_h-90, 50, 50))
-progress_bar_rect = pygame.Rect(50, 280, screen_w-50, 2)
-button_volume_rect = pygame.Rect((screen_w-150)/2-130, screen_h-90, 50, 50)
+progress_bar_rect = pygame.Rect(50, 276, screen_w-50, 4)
+button_volume_rect = pygame.Rect((screen_w-150)/2-180, screen_h-90, 100, 50)
 # Initialize pygame mixer and clock
 pygame.mixer.music.set_endevent(END_SONG)
 clock = pygame.time.Clock()
@@ -61,32 +61,30 @@ currently_playing_song = -1
 
 
 def play_next_song(): # через костыли ну да ;)
-    global currently_playing_song, songs, loop, song_length, track_text
-    next_song = currently_playing_song + 1
+    global currently_playing_song, songs, loop, song_length, track_name
     if loop:
         if currently_playing_song == -1:
             currently_playing_song = 0
-    elif next_song < len(songs):
-        currently_playing_song = next_song
+    elif currently_playing_song == -1:
+            currently_playing_song = 0
     else:
-        currently_playing_song = 0
+        currently_playing_song = (currently_playing_song + 1) % len(songs)
     print(f"played next song №{currently_playing_song+1}")
-    track_text = font.render(f"{songs[currently_playing_song]}", True, (54, 50, 135))
+    track_name = font.render(f"{songs[currently_playing_song]}", True, (54, 50, 135))
     song_length = 0
     pygame.mixer.music.load(f"lab 7/{songs[currently_playing_song]}")
     pygame.mixer.music.play()
 
 def play_previous_song():
-    global currently_playing_song, songs, loop, song_length, track_text
-    previous_song = currently_playing_song -1
+    global currently_playing_song, songs, loop, song_length, track_name
     if loop:
         pass
-    elif previous_song >= 0:
-        currently_playing_song = previous_song
+    elif currently_playing_song == -1:
+        currently_playing_song = 0
     else:
-        currently_playing_song = len(songs)-1
+        currently_playing_song = (currently_playing_song - 1) % len(songs)
     print(f"played previous song №{currently_playing_song+1}")
-    track_text = font.render(f"{songs[currently_playing_song]}", True, (54, 50, 135))
+    track_name = font.render(f"{songs[currently_playing_song]}", True, (54, 50, 135))
     song_length = 0
     pygame.mixer.music.load(f"lab 7/{songs[currently_playing_song]}")
     pygame.mixer.music.play()
@@ -105,9 +103,24 @@ def fill_progress(): # filling progress bar depending on second of track
             song_length = pygame.mixer.Sound(f"lab 7/{songs[currently_playing_song]}").get_length()
             time_duration_text = font.render(f"{round(song_length)//60}:{round(song_length)%60}", True, (54, 50, 135))
         colored_part = 540/song_length * (pos_now / 1000)
+        pygame.draw.rect(progress_bar_surface, (255,255,255), (0, 0, progress_bar_rect[2], 2))
         pygame.draw.rect(progress_bar_surface, (54, 50, 135), (0, 0, colored_part, 2))
     screen.blit(time_now_text, (50,285))
     screen.blit(time_duration_text, (559,285))
+
+def fill_volume():
+    global volume, button_volume_surface, button_volume_text, button_volume_text_rect, button_volume_rect
+    pressed = pygame.key.get_pressed()
+    if pressed[pygame.K_UP]: 
+        volume = min(100, volume + VOLUME_CHANGE)
+        button_volume_text = font.render(f"{volume}", True, (0,0,0))
+        button_volume_text_rect = button_volume_text.get_rect(center=(button_volume_surface.get_width()/2, button_volume_surface.get_height()/2))
+    if pressed[pygame.K_DOWN]: 
+        volume = max(0, volume - VOLUME_CHANGE)
+        button_volume_text = font.render(f"{volume}", True, (0,0,0))
+        button_volume_text_rect = button_volume_text.get_rect(center=(button_volume_surface.get_width()/2, button_volume_surface.get_height()/2))
+    pygame.mixer.music.set_volume(volume / 100)
+    pygame.draw.rect(button_volume_surface, (54, 50, 135), (2, 2, volume-4, 46))
 
 while not done:
     for event in pygame.event.get():
@@ -148,9 +161,11 @@ while not done:
                     play = 1
                     pygame.draw.rect(progress_bar_surface, (0,0,0), (0,0,540,2))
                     print("Button \"Prev\" clicked!")
+            # button loop switcher
             if button_loop_rect.collidepoint(event.pos):
                 looop()
                 print("Button \"Loop\" clicked!")
+            # set vol to 0 and backup if clicked
             if button_volume_rect.collidepoint(event.pos):
                 if volume > 0:
                     volume1 = volume
@@ -159,9 +174,23 @@ while not done:
                 else:
                     volume = volume1
                     button_volume_text = font.render(f"{volume}", True, (0, 0, 0))
+                button_volume_text_rect = button_volume_text.get_rect(center=(button_volume_surface.get_width()/2, button_volume_surface.get_height()/2))
+    # volume changer
+
+    # play button behaviour
+    if play: 
+        if pygame.mixer.music.get_busy() == 0:
+            if currently_playing_song == -1:
+                play_next_song()
+                print("Start playing")
+            else:
+                pygame.mixer.music.unpause()
+    else:
+        pygame.mixer.music.pause()
 
     screen.fill((255,255,255))
     fill_progress()
+    fill_volume()
     
     if not play: button_play_surface.blit(play_text, play_text_rect)
     else: button_play_surface.blit(pause_text, pause_text_rect)
@@ -175,18 +204,7 @@ while not done:
     screen.blit(button_loop_surface, (button_loop_rect[0],button_loop_rect[1]))
     screen.blit(progress_bar_surface, (progress_bar_rect[0], progress_bar_rect[1]))
     screen.blit(button_volume_surface, (button_volume_rect[0], button_volume_rect[1]))
-    screen.blit(track_text, (50,255))
-    
-    pressed = pygame.key.get_pressed()
-    if pressed[pygame.K_UP]: 
-        volume = min(100, volume + VOLUME_CHANGE)
-        button_volume_text = font.render(f"{volume}", True, (54, 50, 135))
-        button_volume_text_rect = button_volume_text.get_rect(center=(button_volume_surface.get_width()/2, button_volume_surface.get_height()/2))
-    if pressed[pygame.K_DOWN]: 
-        volume = max(0, volume - VOLUME_CHANGE)
-        button_volume_text = font.render(f"{volume}", True, (54, 50, 135))
-        button_volume_text_rect = button_volume_text.get_rect(center=(button_volume_surface.get_width()/2, button_volume_surface.get_height()/2))
-    pygame.mixer.music.set_volume(volume / 100)
+    screen.blit(track_name, (50,255))
     
     
     # button play
@@ -219,20 +237,10 @@ while not done:
     
     # volume loop
     if button_volume_rect.collidepoint(pygame.mouse.get_pos()):
-        pygame.draw.rect(button_volume_surface, (230,230,230), (2, 2, 46, 46))
+        pygame.draw.rect(button_volume_surface, (230,230,230), (2, 2, 96, 46))
     else:
-        pygame.draw.rect(button_volume_surface, (0, 0, 0), (0, 0, 50, 50))
-        pygame.draw.rect(button_volume_surface, (255, 255, 255), (2, 2, 46, 46))
-    
-    if play: 
-        if pygame.mixer.music.get_busy() == 0:
-            if currently_playing_song == -1:
-                play_next_song()
-                print("Start playing")
-            else:
-                pygame.mixer.music.unpause()
-    else:
-        pygame.mixer.music.pause()
+        pygame.draw.rect(button_volume_surface, (0, 0, 0), (0, 0, 100, 50))
+        pygame.draw.rect(button_volume_surface, (255, 255, 255), (2, 2, 96, 46))
     
     pygame.display.flip()
     clock.tick(FPS)
