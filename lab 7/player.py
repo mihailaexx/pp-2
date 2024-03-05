@@ -18,14 +18,14 @@ play = 0
 loop = 0
 done = 0
 song_length = 0
-
 font = pygame.font.Font(None, 24)
+
 # creating button surfaces
 button_play_surface = pygame.Surface((150, 50))
 button_next_surface = pygame.Surface((50, 50))
 button_prev_surface = pygame.Surface((50, 50))
 button_loop_surface = pygame.Surface((50, 50))
-button_volume_surface = pygame.Surface((100, 50))
+button_volume_surface = pygame.Surface((115, 50))
 progress_bar_surface = pygame.Surface((540, 4))
 # create var's with diff texts
 play_text = font.render("Play", True, (54, 50, 135))
@@ -50,7 +50,7 @@ button_next_rect = pygame.Rect((screen_w-150)/2+165, screen_h-90, 50, 50)
 button_prev_rect = pygame.Rect((screen_w-150)/2-65, screen_h-90, 50, 50)
 button_loop_rect = pygame.Rect(((screen_w-150)/2+230, screen_h-90, 50, 50))
 progress_bar_rect = pygame.Rect(50, 276, screen_w-50, 4)
-button_volume_rect = pygame.Rect((screen_w-150)/2-180, screen_h-90, 100, 50)
+button_volume_rect = pygame.Rect((screen_w-150)/2-195, screen_h-90, 115, 50)
 # Initialize pygame mixer and clock
 pygame.mixer.music.set_endevent(END_SONG)
 clock = pygame.time.Clock()
@@ -120,7 +120,7 @@ def fill_volume():
         button_volume_text = font.render(f"{volume}", True, (0,0,0))
         button_volume_text_rect = button_volume_text.get_rect(center=(button_volume_surface.get_width()/2, button_volume_surface.get_height()/2))
     pygame.mixer.music.set_volume(volume / 100)
-    pygame.draw.rect(button_volume_surface, (54, 50, 135), (2, 2, volume-4, 46))
+    pygame.draw.rect(button_volume_surface, (54, 50, 135), (2, 2, 1.11*volume, 46))
 
 while not done:
     for event in pygame.event.get():
@@ -207,7 +207,7 @@ while not done:
     screen.blit(track_name, (50,255))
     
     
-    # button play
+    # buttons collision
     if button_play_rect.collidepoint(pygame.mouse.get_pos()):
         pygame.draw.rect(button_play_surface, (230,230,230), (2, 2, 146, 46))
     else:
@@ -237,10 +237,10 @@ while not done:
     
     # volume loop
     if button_volume_rect.collidepoint(pygame.mouse.get_pos()):
-        pygame.draw.rect(button_volume_surface, (230,230,230), (2, 2, 96, 46))
+        pygame.draw.rect(button_volume_surface, (230,230,230), (2, 2, 111, 46))
     else:
-        pygame.draw.rect(button_volume_surface, (0, 0, 0), (0, 0, 100, 50))
-        pygame.draw.rect(button_volume_surface, (255, 255, 255), (2, 2, 96, 46))
+        pygame.draw.rect(button_volume_surface, (0, 0, 0), (0, 0, 115, 50))
+        pygame.draw.rect(button_volume_surface, (255, 255, 255), (2, 2, 111, 46))
     
     pygame.display.flip()
     clock.tick(FPS)
