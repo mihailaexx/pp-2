@@ -1,4 +1,22 @@
 from player_class import *
+
+player_window = Player(screen, (player_w, player_h), (0, 0)) # создание окна плеера
+if True: # создание кнопок
+    shuffle_button = Button(player_window.surface, (50,50), (25, player_h - 75), "Shuffle", 20, acent_color, pygame.K_s, turn_on=False)
+    all_buttons.append(shuffle_button)
+    prev_button = Button(player_window.surface, (50,50), (shuffle_button.pos[0] + shuffle_button.size[0] + space_between_buttons, player_h - 75), "Prev", 20, acent_color, pygame.K_LEFT)
+    all_buttons.append(prev_button)
+    play_button = Button(player_window.surface, (150,50), (prev_button.pos[0] + prev_button.size[0] + space_between_buttons, player_h - 75), "Play", 20, acent_color, pygame.K_SPACE, "Pause")
+    all_buttons.append(play_button)
+    next_button = Button(player_window.surface, (50,50), (play_button.pos[0] + play_button.size[0] + space_between_buttons, player_h - 75), "Next", 20, acent_color, pygame.K_RIGHT)
+    all_buttons.append(next_button)
+    loop_button = Button(player_window.surface, (50,50), (next_button.pos[0] + next_button.size[0] + space_between_buttons, player_h - 75), "Loop", 20, acent_color, pygame.K_l, turn_on=False)
+    all_buttons.append(loop_button)
+song_list = Songs(songs) # создание списка песен
+progress_bar = ProgressBar(player_window.surface) # создание прогресс бара
+pic = SongPicture(player_window.surface) # создание картинки песни
+volume_bar = Button(player_window.surface, (150, 50), (player_w - 175, player_h - 75), "Volume", 20, acent_color, pygame.MOUSEWHEEL) # создание ползунка громкости
+
 def event_handler(): # проверка событий
     global done
     for event in pygame.event.get():
@@ -21,10 +39,13 @@ def event_handler(): # проверка событий
                 song_list.play_prev_song()
             if event.key == pygame.K_l:
                 song_list.loop = not song_list.loop
+                loop_button.turn_on = not loop_button.turn_on 
                 print(f"Loop is {song_list.loop}")
             if event.key == pygame.K_s:
+                shuffle_button.turn_on = not shuffle_button.turn_on 
                 song_list.shuffle_list()
         
+        # song end control
         if event.type == END_SONG:
             song_list.play_next_song()
             print("the song ended!")
@@ -41,26 +62,12 @@ def event_handler(): # проверка событий
                 song_list.play_prev_song()
             if loop_button.rect.collidepoint(event.pos):
                 song_list.loop = not song_list.loop
+                loop_button.turn_on = not loop_button.turn_on 
                 print(f"Loop is {song_list.loop}")
             if shuffle_button.rect.collidepoint(event.pos):
+                shuffle_button.turn_on = not shuffle_button.turn_on 
                 song_list.shuffle_list()
 
-player_window = Player(screen, (player_w, player_h), (0, 0)) # создание окна плеера
-if True: # создание кнопок
-    shuffle_button = Button(player_window.surface, (50,50), (25, player_h - 75), "Shuffle", 20, acent_color, pygame.K_s, turn_on=False)
-    all_buttons.append(shuffle_button)
-    prev_button = Button(player_window.surface, (50,50), (shuffle_button.pos[0] + shuffle_button.size[0] + space_between_buttons, player_h - 75), "Prev", 20, acent_color, pygame.K_LEFT)
-    all_buttons.append(prev_button)
-    play_button = Button(player_window.surface, (150,50), (prev_button.pos[0] + prev_button.size[0] + space_between_buttons, player_h - 75), "Play", 20, acent_color, pygame.K_SPACE, "Pause")
-    all_buttons.append(play_button)
-    next_button = Button(player_window.surface, (50,50), (play_button.pos[0] + play_button.size[0] + space_between_buttons, player_h - 75), "Next", 20, acent_color, pygame.K_RIGHT)
-    all_buttons.append(next_button)
-    loop_button = Button(player_window.surface, (50,50), (next_button.pos[0] + next_button.size[0] + space_between_buttons, player_h - 75), "Loop", 20, acent_color, pygame.K_l, turn_on=False)
-    all_buttons.append(loop_button)
-song_list = Songs(songs) # создание списка песен
-progress_bar = ProgressBar(player_window.surface) # создание прогресс бара
-pic = SongPicture(player_window.surface) # создание картинки песни
-volume_bar = Button(player_window.surface, (150, 50), (player_w - 175, player_h - 75), "Volume", 20, acent_color, pygame.MOUSEWHEEL) # создание ползунка громкости
 
 while not done:
     event_handler()

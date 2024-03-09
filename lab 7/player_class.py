@@ -131,28 +131,31 @@ class Button():
         self.turn_on = turn_on
         self.key = key
     def draw(self):
-        if self.show_alternative: self.surface.blit(self.alternative_text, self.alternative_text_rect) # отображение альтернативного текста
-        else: self.surface.blit(self.text, self.text_rect) # отображение текста
-        
-        self.screen.blit(self.surface, (self.pos[0], self.pos[1])) # отображение кнопки на поверхности
-        
+
         black = (self.surface, (0, 0, 0), (0, 0, self.size[0], self.size[1])) # черный
         lightgray = (self.surface, (235, 235, 235), (1, 1, self.size[0]-2, self.size[1]-2)) # светло-серый
         gray_border = (self.surface, (200, 200, 200), (2, 2, self.size[0]-2, self.size[1]-2)) # серый и большие края
         white = (self.surface, (255, 255, 255), (1, 1, self.size[0]-2, self.size[1]-2)) # белый
-        
         # поведение кнопки
         pygame.draw.rect(*black) 
         if self.rect.collidepoint(pygame.mouse.get_pos()): # чек если курсор на кнопке
             if pygame.mouse.get_pressed()[0]: # зажата LBM
                 pygame.draw.rect(*gray_border)
             else: # просто навел
-                pygame.draw.rect(*lightgray)
+                if self.turn_on: pygame.draw.rect(*gray_border)
+                else: pygame.draw.rect(*lightgray)
         else:
             if pygame.key.get_pressed()[self.key]: # зажата клавиша на клавиатуре
                 pygame.draw.rect(*gray_border)
             else:
-                pygame.draw.rect(*white)
+                if self.turn_on: pygame.draw.rect(*gray_border) 
+                else: pygame.draw.rect(*white)
+        
+        if self.show_alternative: self.surface.blit(self.alternative_text, self.alternative_text_rect) # отображение альтернативного текста
+        else: self.surface.blit(self.text, self.text_rect) # отображение текста
+        
+        self.screen.blit(self.surface, (self.pos[0], self.pos[1])) # отображение кнопки на поверхности
+
     def fill(self, song: Songs):
         self.text = self.font.render(str(song.volume), True, (0,0,0))
         self.text_rect = self.text.get_rect(center=(self.size[0]/2, self.size[1]/2))
