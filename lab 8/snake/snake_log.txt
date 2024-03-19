@@ -1,8 +1,0 @@
----START GAME---
-YOU COLLECT APPLE
-New apple apear in (175, 425)
-
-YOU LOSE
-Reason: out of border
-Score:1
----END GAME---

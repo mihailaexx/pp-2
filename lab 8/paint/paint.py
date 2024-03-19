@@ -20,6 +20,7 @@ color_green = (0,255,0)
 color_blue = (0,0,255)
 color_purple = (128,0,128)
 current_color = color_black
+current_thickness = 2
 
 done = 0
 FPS = 60
@@ -32,54 +33,68 @@ def while_pressed_mouse_pos_tracking(points: list = []):
         points.clear()
         return points_copy
 
-def eraser(current_color: tuple, screen: pygame.surface):
+def eraser(current_color: tuple, screen: pygame.surface, thickness: int = 2):
     pnts = while_pressed_mouse_pos_tracking(points)
     if pnts != None and len(pnts) > 1:
-        pygame.draw.lines(screen, (255,255,255), False, pnts, 40)
+        pygame.draw.lines(screen, (255,255,255), False, pnts, thickness)
         pygame.display.update()
 
-def brush(current_color: tuple, screen: pygame.surface):
+def brush(current_color: tuple, screen: pygame.surface, thickness: int = 2):
     pnts = while_pressed_mouse_pos_tracking(points)
     if pnts != None and len(pnts) > 1:
-        pygame.draw.lines(screen, current_color, False, pnts, 2)
+        pygame.draw.lines(screen, current_color, False, pnts, thickness)
         pygame.display.update()
 
-def line(current_color: tuple, screen: pygame.surface):
+def brush2(current_color: tuple, screen: pygame.surface, thickness: int = 2):
     pnts = while_pressed_mouse_pos_tracking(points)
     if pnts != None and len(pnts) > 1:
-        pygame.draw.line(screen, current_color, pnts[0], pnts[-1], 2)
+        for i in range(len(pnts)-1):
+            start_pos = pnts[i]
+            end_pos = pnts[i+1]
+            # Рисуем линию между текущей и следующей точкой
+            pygame.draw.line(screen, current_color, start_pos, end_pos, thickness)
+            # Рисуем круг на текущей точке для непрерывности кисти
+            pygame.draw.circle(screen, current_color, start_pos, thickness // 2)
+        # Рисуем круг на последней точке
+        pygame.draw.circle(screen, current_color, pnts[-1], thickness // 2)
         pygame.display.update()
 
-def rectangle(current_color: tuple, screen: pygame.surface):
+def line(current_color: tuple, screen: pygame.surface, thickness: int = 2):
+    pnts = while_pressed_mouse_pos_tracking(points)
+    if pnts != None and len(pnts) > 1:
+        pygame.draw.line(screen, current_color, pnts[0], pnts[-1], thickness)
+        pygame.display.update()
+
+def rectangle(current_color: tuple, screen: pygame.surface, thickness: int = 2):
     pnts = while_pressed_mouse_pos_tracking(points)
     if pnts != None and len(pnts) > 1:
         pos_x = pnts[-1][0] if (pnts[0][0] > pnts[-1][0]) else pnts[0][0]
         pos_y = pnts[-1][1] if (pnts[0][1] > pnts[-1][1]) else pnts[0][1]
-        pygame.draw.rect(screen, current_color, (pos_x, pos_y, abs(pnts[0][0] - pnts[-1][0]), abs(pnts[0][1] - pnts[-1][1])), 2)
+        pygame.draw.rect(screen, current_color, (pos_x, pos_y, abs(pnts[0][0] - pnts[-1][0]), abs(pnts[0][1] - pnts[-1][1])), thickness)
         pygame.display.update()
 
-def elipse(current_color: tuple, screen: pygame.surface):
+def elipse(current_color: tuple, screen: pygame.surface, thickness: int = 2):
     pnts = while_pressed_mouse_pos_tracking(points)
     if pnts != None and len(pnts) > 1:
         pos_x = pnts[-1][0] if (pnts[0][0] > pnts[-1][0]) else pnts[0][0]
         pos_y = pnts[-1][1] if (pnts[0][1] > pnts[-1][1]) else pnts[0][1]
-        pygame.draw.ellipse(screen, current_color, (pos_x, pos_y, abs(pnts[0][0] - pnts[-1][0]), abs(pnts[0][1] - pnts[-1][1])), 2)
+        pygame.draw.ellipse(screen, current_color, (pos_x, pos_y, abs(pnts[0][0] - pnts[-1][0]), abs(pnts[0][1] - pnts[-1][1])), thickness)
         pygame.display.update()
 
-def right_triangle(current_color: tuple, screen: pygame.surface):
+def right_triangle(current_color: tuple, screen: pygame.surface, thickness: int = 2):
     pnts = while_pressed_mouse_pos_tracking(points)
     if pnts != None and len(pnts) > 1:
-        pygame.draw.lines(screen, current_color, True, [pnts[0], (pnts[0][0], pnts[-1][1]), pnts[-1]], 2)
+        pygame.draw.lines(screen, current_color, True, [pnts[0], (pnts[0][0], pnts[-1][1]), pnts[-1]], thickness)
 
-def equilateral_triangle(current_color: tuple, screen: pygame.surface):
+def equilateral_triangle(current_color: tuple, screen: pygame.surface, thickness: int = 2):
     pnts = while_pressed_mouse_pos_tracking(points)
     if pnts != None and len(pnts) > 1:
-        pygame.draw.lines(screen, current_color, True, [pnts[-1], (pnts[0][0], pnts[-1][1]), ((abs(pnts[0][0]+pnts[-1][0])/2, pnts[0][1]))], 2)
+        pygame.draw.lines(screen, current_color, True, [pnts[-1], (pnts[0][0], pnts[-1][1]), ((abs(pnts[0][0]+pnts[-1][0])/2, pnts[0][1]))], thickness)
 
-def rhombus(current_color: tuple, screen: pygame.surface):
+def rhombus(current_color: tuple, screen: pygame.surface, thickness: int = 2):
     pnts = while_pressed_mouse_pos_tracking(points)
     if pnts != None and len(pnts) > 1:
-        pygame.draw.lines(screen, current_color, True, [(abs(pnts[0][0]+pnts[-1][0])/2, pnts[0][1]),(pnts[0][0], abs(pnts[0][1]+pnts[-1][1])/2),(abs(pnts[0][0]+pnts[-1][0])/2, pnts[-1][1]), (pnts[-1][0], abs(pnts[0][1]+pnts[-1][1])/2)], 2)
+        pygame.draw.lines(screen, current_color, True, [(abs(pnts[0][0]+pnts[-1][0])/2, pnts[0][1]),(pnts[0][0], abs(pnts[0][1]+pnts[-1][1])/2),(abs(pnts[0][0]+pnts[-1][0])/2, pnts[-1][1]), (pnts[-1][0], abs(pnts[0][1]+pnts[-1][1])/2)], thickness)
 
 # def dashed_rectangle(surface, color, rect, dash_length = 6):
 #     x1, y1, width, height = rect
@@ -195,7 +210,7 @@ if True:
     clear_all_button = Button(bar.surface, (10,10), (50,50), "Clear")
     eraser_button = Button(bar.surface, (70,10), (50,50), "Eraser", eraser, turn_on=False)
     tool_buttons.append(eraser_button)
-    brush_button = Button(bar.surface, (130,10), (50,50), "Brush", brush, turn_on=False)
+    brush_button = Button(bar.surface, (130,10), (50,50), "Brush", brush2, turn_on=False)
     tool_buttons.append(brush_button)
     line_button = Button(bar.surface, (190,10), (50,50), "Line", line, turn_on=False)
     tool_buttons.append(line_button)
@@ -227,7 +242,7 @@ if True:
     color_buttons.append(color_black_button)
 
 def event_handler():
-    global done, current_tool, current_color
+    global done, current_tool, current_color, current_thickness
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = 1
@@ -244,6 +259,12 @@ def event_handler():
                         button.turn_on = False
                     color_button.turn_on = True
                     current_color = color_button.color
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            current_tool = None
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
+            current_thickness += 1
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
+            current_thickness -= 1
     if clear_all_button.rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]:
         canva.surface.fill((255,255,255))
         pygame.display.update()
@@ -259,8 +280,11 @@ while not done:
     canva.draw()
     # canva.track()
     
+    screen.blit(pygame.font.Font(None, 24).render(f"Thickness: {current_thickness}", True, (0, 0, 0)), (player_w-150, 10))
+    
+    current_thickness = max(1, min(100, current_thickness))
     if current_tool and canva.rect.collidepoint(pygame.mouse.get_pos()):
-        current_tool(current_color, canva.surface)
+        current_tool(current_color, canva.surface, current_thickness)
     
     pygame.display.flip()
     pygame.time.Clock().tick(FPS)
