@@ -120,8 +120,6 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.done = True
-            # elif event.type in (pygame.KEYDOWN, pygame.KEYUP) and event.key in [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]:
-            #     self.snake.direction = event.key
             elif event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP and self.snake.direction != pygame.K_DOWN:
                     self.snake.direction = pygame.K_UP
@@ -138,7 +136,7 @@ class Game:
             self.score += self.apple.weight
             self.snake.grow()
             self.apple_timer = 0
-        if self.score != 0:
+        if self.score != 0: # timer for apple
             if self.apple_timer <= 0:
                 self.apple = Apple(game=self)
                 self.apple_timer = 10000/self.calculate_speed_delay()
