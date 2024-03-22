@@ -6,7 +6,7 @@ import time
 pygame.init()
 
 # Define colors
-BLACK = (0, 0, 0, 130)
+BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 100, 0)
 RED = (230, 0, 0)
@@ -19,12 +19,15 @@ FPS = 60
 
 # Define classes
 class Apple:
-    def __init__(self):
-        self.position = self.create_entity()
+    def __init__(self, game):
+        self.position = self.create_entity(game)
         self.weight = random.randint(1, 3)
 
-    def create_entity(self):
-        return (random.randint(1, 18) * 50 + 25, random.randint(1, 16) * 50 + 25)
+    def create_entity(self, game):
+        x, y = (random.randint(1, 18) * 50 + 25, random.randint(1, 16) * 50 + 25)
+        while (x,y) in game.snake.parts:
+            x, y = (random.randint(1, 18) * 50 + 25, random.randint(1, 16) * 50 + 25)
+        return (x,y)
 
     def draw(self, screen):
         weight_text = game.font.render(str(self.weight), True, BLACK)
@@ -75,14 +78,14 @@ class Snake:
 
     def check_boundary(self):
         x, y = self.parts[0]
-        if self.parts[0][0] < SNAKE_PART_RADIUS or x > SIZE[0] - SNAKE_PART_RADIUS or y < SNAKE_PART_RADIUS or y > SIZE[1] - SNAKE_PART_RADIUS:
+        if x < SNAKE_PART_RADIUS or x > SIZE[0] - SNAKE_PART_RADIUS or y < SNAKE_PART_RADIUS or y > SIZE[1] - SNAKE_PART_RADIUS:
             return True
 
 class Game:
     def __init__(self):
         self.screen = pygame.display.set_mode(SIZE)
         self.snake = Snake()
-        self.apple = Apple()
+        self.apple = Apple(game=self)
         self.score = 0
         self.level = 0
         self.font = pygame.font.Font(None, 24)
@@ -91,6 +94,7 @@ class Game:
         self.done = False
         self.game_over = False
         self.draw_background()
+        self.apple_timer = 10000/self.calculate_speed_delay()
 
     def draw_background(self):
         self.screen.fill(WHITE)
@@ -109,7 +113,7 @@ class Game:
                 pygame.time.delay(self.calculate_speed_delay())
 
     def calculate_speed_delay(self):
-        delay = max(1000 - (self.score * 25), 250)
+        delay = max(1000 - (self.score * 25), 100)
         return delay
     
     def handle_events(self):
@@ -132,11 +136,17 @@ class Game:
         self.snake.move()
         if self.snake.parts[0] == self.apple.position:
             self.score += self.apple.weight
-            self.apple = Apple()
             self.snake.grow()
+            self.apple_timer = 0
+        if self.score != 0:
+            if self.apple_timer <= 0:
+                self.apple = Apple(game=self)
+                self.apple_timer = 10000/self.calculate_speed_delay()
+            else:
+                self.apple_timer -= 1
         if self.snake.check_collision() or self.snake.check_boundary():
             self.game_over = True
-        self.level = self.score // 2
+        self.level = min(self.score // 2, 37)
 
     def draw_game(self):
         self.draw_background()
@@ -151,8 +161,11 @@ class Game:
         pygame.display.flip()
 
     def show_game_over(self):
+        self.screen.fill(WHITE)
         game_over_text = self.go_font.render("GAME OVER", True, RED, (12, 12, 12))
+        score_text = self.go_font.render(f"Score: {self.score}", True, BLACK)
         self.screen.blit(game_over_text, (250, 300))
+        self.screen.blit(score_text, (330, 400))
         pygame.display.flip()
         time.sleep(2)
         self.done = True
