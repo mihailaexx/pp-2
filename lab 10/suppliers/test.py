@@ -1,5 +1,6 @@
-import psycopg2
+import psycopg2, re, os
 from configparser import ConfigParser
+from getpass import getpass
 
 def load_config(filename='database.ini', section='postgresql'):
     """
@@ -48,7 +49,13 @@ def db_call(query, data=None, fetch=False):
         print(f"Error: {error}")
         return None
 
-create_comands = (
+def clear_console():
+    """
+    Clear the console.
+    """
+    os.system('clear') if os.name == 'posix' else os.system('cls')
+
+tables_deployment = (
     """
     CREATE TABLE users (
         user_id SERIAL PRIMARY KEY,
@@ -67,28 +74,65 @@ create_comands = (
 
 if __name__ == "__main__":
     config = load_config()
-    print(f"Connected as {config['user']} to {config['database']} database")
-    try:
-        with psycopg2.connect(**config) as conn:
-            print('Connected to the PostgreSQL server.')
-            # with conn.cursor() as cur:
-            #     for command in create_comands:
-            #         cur.execute(command)
-            #         print("table added")
-            #! db_call(command for command in create_comands)
-            # with conn.cursor() as cur:
-            #     user_name = input("Enter user name: ")
-            #     user_password = input("Enter password: ")
-            #     cur.execute("INSERT INTO users (user_name, user_pasword) VALUES (%s, %s)",
-            #         (user_name, user_password))
-            #     conn.commit()
-            #     print("User added successfully.")
-            db_call("INSERT INTO users (user_name, user_password) VALUES (%s, %s)", ("test_user_n", "123456"))
-            # with conn.cursor() as cur:
-            #     cur.execute("SELECT * FROM users")
-            #     records = cur.fetchall()
-            #     for record in records:
-            #         print(record)
-            print(*db_call("SELECT * FROM users", fetch=True), sep='\n')
-    except (psycopg2.DatabaseError, Exception) as error:
-        print(error)
+    print("Trying to connect to the database...")
+    while True:
+        try:
+            with psycopg2.connect(**config) as conn:
+                print(f"Connected as {config['user']} to {config['database']} database\nWaiting for commands...")
+                command = input("\n>>>")
+                if command == "help" or command == "h":
+                    clear_console()
+                    print("Commands:\ndeploy\nadd user\nshow users\nshow admins\nexit\n")
+                elif command == "drop":
+                    clear_console()
+                    db_call("DROP TABLE users, admins")
+                    print("Tables dropped.")
+                elif command == "add administr4t0r":
+                    clear_console()
+                    print("Add a new admin(ONLY FOR TESTING)")
+                    admin_name = input("Enter admin name: ").strip()
+                    admin_password = input("Enter admin password: ").strip()
+                    if not re.fullmatch(r"^[a-zA-Z0-9\-_!^&*]+$", admin_password): 
+                        print("Password must contain only letters, numbers, and symbols: -_!^&*")
+                        continue
+                    clear_console()
+                    db_call("INSERT INTO admins (admin_name, admin_password) VALUES (%s, %s)", (admin_name, admin_password))
+                elif command == "deploy":
+                    clear_console()
+                    for table in tables_deployment:
+                        db_call(table)
+                elif command == "add user":
+                    clear_console()
+                    print("Add a new user")
+                    user_name = input("Enter user name: ").strip()
+                    if db_call(f"SELECT user_name FROM users WHERE user_name = \'{user_name}\'", fetch=True): 
+                        print("User already exists.")
+                        continue
+                    user_password = getpass("Enter user password: ")
+                    if not re.fullmatch(r"^[a-zA-Z0-9\-_!^&*]+$", user_password): 
+                        print("Password must contain only letters, numbers, and symbols: -_!^&*")
+                        continue
+                    clear_console()
+                    db_call("INSERT INTO users (user_name, user_password) VALUES (%s, %s)", (user_name, user_password))
+                elif command == "show users":
+                    clear_console()
+                    print("Users:")
+                    list_of_users = db_call("SELECT user_id, user_name FROM users", fetch=True)
+                    print(*list_of_users, sep='\n') if list_of_users else print("No users found.")
+                elif command == "show admins":
+                    clear_console()
+                    print("Login as an admin to show admin list:")
+                    admin_name = input("Enter admin name: ").strip()
+                    if db_call(f"SELECT admin_name FROM admins WHERE admin_name = \'{admin_name}\'", fetch=True):
+                        admin_password = getpass("Enter admin password: ")
+                        if db_call(f"SELECT * FROM admins WHERE admin_name = \'{admin_name}\' AND admin_password = \'{admin_password}\'", fetch=True):
+                            clear_console()
+                            print("Login successful.")
+                            print(*db_call("SELECT * FROM admins", fetch=True), sep='\n')
+                elif command == "exit":
+                    break
+                else:
+                    clear_console()
+                    print("unknown command")
+        except (psycopg2.DatabaseError, Exception) as error:
+            print(error)
