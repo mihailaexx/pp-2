@@ -203,7 +203,7 @@ class SongPicture():
         self.size = size
         self.pos = pos
         self.surface = pygame.Surface(size)
-        self.image = pygame.image.load("lab 7/pic.png") # поидее тут надо загружать изображение песни
+        self.image = pygame.image.load("lab 7/player/pic.png") # поидее тут надо загружать изображение песни
         self.image_rect = self.image.get_rect(center=(size[0]/2, size[1]/2))
         self.rect = pygame.Rect(pos[0], pos[1], size[0], size[1])
     def draw(self):

@@ -1,5 +1,6 @@
 import pygame 
 import random
+import sys
 pygame.init()
 
 WIDTH, HEIGHT = 1200, 800
@@ -167,6 +168,7 @@ class Game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
             if event.type == pygame.USEREVENT:
                 self.paddle.rect.y -= 5
                 pygame.time.set_timer(pygame.USEREVENT, 0)
@@ -180,6 +182,7 @@ class Game():
                         self.game_state = GAME_RUNNING
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
+                        sys.exit()
                 if self.game_state == GAME_RUNNING:
                     if event.key == pygame.K_ESCAPE:
                         self.game_state = GAME_MENU

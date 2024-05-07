@@ -1,2 +1,2 @@
 fruits = {"apple", "banana", "cherry"}
-fruits.discard("banana")
+fruits.discard("banana") # remove without error
